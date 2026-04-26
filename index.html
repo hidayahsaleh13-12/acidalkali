@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Analisis Ion Kimia</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; padding: 20px; color: #333; }
+        .container { max-width: 450px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #2c3e50; margin-top: 0; }
+        
+        .box { margin-bottom: 15px; }
+        label { font-weight: bold; font-size: 14px; color: #555; }
+        select { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; }
+        
+        button { 
+            width: 100%; padding: 15px; background-color: #27ae60; color: white; 
+            border: none; border-radius: 8px; font-size: 16px; font-weight: bold; 
+            cursor: pointer; margin-top: 10px;
+        }
+        button:hover { background-color: #219150; }
+
+        /* Bahagian Hasil */
+        #hasil-section { display: none; margin-top: 25px; border-top: 2px solid #eee; padding-top: 20px; }
+        .kad-hasil { background: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 5px solid #27ae60; }
+        .tajuk-kecil { font-size: 12px; color: #7f8c8d; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .teks-utama { font-size: 18px; font-weight: bold; color: #2c3e50; }
+        
+        .ion-container { display: flex; justify-content: space-around; margin-top: 10px; text-align: center; }
+        .ion-box { background: #fff; padding: 10px; border: 1px solid #ddd; border-radius: 8px; width: 40%; }
+        .ion-simbol { font-size: 20px; font-weight: bold; color: #e67e22; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Lab Peneutralan</h2>
+    
+    <div class="box">
+        <label>Pilih Asid (Sumber Anion):</label>
+        <select id="asid">
+            <option value="HCl">Asid Hidroklorik (HCl)</option>
+            <option value="H2SO4">Asid Sulfurik (H₂SO₄)</option>
+            <option value="HNO3">Asid Nitrik (HNO₃)</option>
+        </select>
+    </div>
+
+    <div class="box">
+        <label>Pilih Alkali (Sumber Kation):</label>
+        <select id="alkali">
+            <option value="NaOH">Natrium Hidroksida (NaOH)</option>
+            <option value="KOH">Kalium Hidroksida (KOH)</option>
+            <option value="Ca(OH)2">Kalsium Hidroksida (Ca(OH)₂)</option>
+        </select>
+    </div>
+
+    <button onclick="prosesKimia()">TINDAK BALAS</button>
+
+    <div id="hasil-section">
+        <div class="kad-hasil">
+            <div class="tajuk-kecil">Persamaan Tindak Balas</div>
+            <div id="persamaan" class="teks-utama"></div>
+        </div>
+
+        <div class="kad-hasil" style="border-left-color: #e67e22;">
+            <div class="tajuk-kecil">Ion Terlibat Dalam Garam</div>
+            <div class="ion-container">
+                <div class="ion-box">
+                    <div id="kation" class="ion-simbol"></div>
+                    <small>Kation (+)</small>
+                </div>
+                <div class="ion-box">
+                    <div id="anion" class="ion-simbol"></div>
+                    <small>Anion (-)</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="kad-hasil" style="border-left-color: #3498db;">
+            <div class="tajuk-kecil">Keputusan Analisis</div>
+            <div id="deskripsi" style="font-size: 14px; line-height: 1.4;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const database = {
+        "HCl+NaOH": { eq: "HCl + NaOH → NaCl + H₂O", k: "Na⁺", a: "Cl⁻", d: "Menghasilkan Natrium Klorida. Ion kation berasal dari alkali dan anion dari asid." },
+        "HCl+KOH": { eq: "HCl + KOH → KCl + H₂O", k: "K⁺", a: "Cl⁻", d: "Menghasilkan Kalium Klorida. Tindak balas lengkap satu mol asid dan satu mol alkali." },
+        "H2SO4+NaOH": { eq: "H₂SO₄ + 2NaOH → Na₂SO₄ + 2H₂O", k: "Na⁺", a: "SO₄²⁻", d: "Asid sulfurik mendermakan dua ion H⁺. Garam yang terbentuk ialah Natrium Sulfat." },
+        "H2SO4+KOH": { eq: "H₂SO₄ + 2KOH → K₂SO₄ + 2H₂O", k: "K⁺", a: "SO₄²⁻", d: "Menghasilkan Kalium Sulfat. Perhatikan cas anion sulfat ialah 2-." },
+        "HNO3+NaOH": { eq: "HNO₃ + NaOH → NaNO₃ + H₂O", k: "Na⁺", a: "NO₃⁻", d: "Menghasilkan Natrium Nitrat. Semua garam nitrat adalah terlarut dalam air." },
+        "HNO3+KOH": { eq: "HNO₃ + KOH → KNO₃ + H₂O", k: "K⁺", a: "NO₃⁻", d: "Menghasilkan Kalium Nitrat, sering digunakan dalam baja dan bahan api." },
+        "HCl+Ca(OH)2": { eq: "2HCl + Ca(OH)₂ → CaCl₂ + 2H₂O", k: "Ca²⁺", a: "Cl⁻", d: "Kation Kalsium mempunyai cas 2+, maka dua ion Klorida diperlukan." }
+    };
+
+    function prosesKimia() {
+        const asid = document.getElementById('asid').value;
+        const alkali = document.getElementById('alkali').value;
+        const kunci = asid + "+" + alkali;
+        const data = database[kunci];
+
+        if (data) {
+            document.getElementById('hasil-section').style.display = "block";
+            document.getElementById('persamaan').innerText = data.eq;
+            document.getElementById('kation').innerText = data.k;
+            document.getElementById('anion').innerText = data.a;
+            document.getElementById('deskripsi').innerText = data.d;
+        } else {
+            alert("Kombinasi ini belum ada dalam data.");
+        }
+    }
+</script>
+
+</body>
+</html>
