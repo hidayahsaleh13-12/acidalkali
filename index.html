@@ -3,111 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Analisis Ion Kimia</title>
+    <title>Kalkulator Imbangan Kimia</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; padding: 20px; color: #333; }
-        .container { max-width: 450px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #2c3e50; margin-top: 0; }
-        
-        .box { margin-bottom: 15px; }
-        label { font-weight: bold; font-size: 14px; color: #555; }
-        select { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; }
-        
-        button { 
-            width: 100%; padding: 15px; background-color: #27ae60; color: white; 
-            border: none; border-radius: 8px; font-size: 16px; font-weight: bold; 
-            cursor: pointer; margin-top: 10px;
-        }
-        button:hover { background-color: #219150; }
-
-        /* Bahagian Hasil */
-        #hasil-section { display: none; margin-top: 25px; border-top: 2px solid #eee; padding-top: 20px; }
-        .kad-hasil { background: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 5px solid #27ae60; }
-        .tajuk-kecil { font-size: 12px; color: #7f8c8d; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-        .teks-utama { font-size: 18px; font-weight: bold; color: #2c3e50; }
-        
-        .ion-container { display: flex; justify-content: space-around; margin-top: 10px; text-align: center; }
-        .ion-box { background: #fff; padding: 10px; border: 1px solid #ddd; border-radius: 8px; width: 40%; }
-        .ion-simbol { font-size: 20px; font-weight: bold; color: #e67e22; }
+        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #f8f9fa; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .result-box { margin-top: 20px; padding: 15px; background: #e8f4fd; border-radius: 10px; display: none; }
+        .coeff { color: #d35400; font-weight: bold; font-size: 20px; }
+        .molecule { font-size: 18px; font-weight: bold; }
+        select, button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; border: 1px solid #ddd; }
+        button { background: #2c3e50; color: white; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Lab Peneutralan</h2>
-    
-    <div class="box">
-        <label>Pilih Asid (Sumber Anion):</label>
-        <select id="asid">
-            <option value="HCl">Asid Hidroklorik (HCl)</option>
-            <option value="H2SO4">Asid Sulfurik (H₂SO₄)</option>
-            <option value="HNO3">Asid Nitrik (HNO₃)</option>
-        </select>
-    </div>
+    <h2>Imbangan Persamaan</h2>
+    <p><small>Aplikasi ini mengira nisbah mol untuk peneutralan lengkap.</small></p>
 
-    <div class="box">
-        <label>Pilih Alkali (Sumber Kation):</label>
-        <select id="alkali">
-            <option value="NaOH">Natrium Hidroksida (NaOH)</option>
-            <option value="KOH">Kalium Hidroksida (KOH)</option>
-            <option value="Ca(OH)2">Kalsium Hidroksida (Ca(OH)₂)</option>
-        </select>
-    </div>
+    <label>Asid:</label>
+    <select id="asid">
+        <option value="HCl">HCl (Monoprotik)</option>
+        <option value="H2SO4">H₂SO₄ (Diprotik)</option>
+        <option value="H3PO4">H₃PO₄ (Triprotik)</option>
+    </select>
 
-    <button onclick="prosesKimia()">TINDAK BALAS</button>
+    <label>Alkali:</label>
+    <select id="alkali">
+        <option value="NaOH">NaOH</option>
+        <option value="Ca(OH)2">Ca(OH)₂</option>
+    </select>
 
-    <div id="hasil-section">
-        <div class="kad-hasil">
-            <div class="tajuk-kecil">Persamaan Tindak Balas</div>
-            <div id="persamaan" class="teks-utama"></div>
-        </div>
+    <button onclick="kiraImbangan()">IMBANGKAN SEKARANG</button>
 
-        <div class="kad-hasil" style="border-left-color: #e67e22;">
-            <div class="tajuk-kecil">Ion Terlibat Dalam Garam</div>
-            <div class="ion-container">
-                <div class="ion-box">
-                    <div id="kation" class="ion-simbol"></div>
-                    <small>Kation (+)</small>
-                </div>
-                <div class="ion-box">
-                    <div id="anion" class="ion-simbol"></div>
-                    <small>Anion (-)</small>
-                </div>
-            </div>
-        </div>
-
-        <div class="kad-hasil" style="border-left-color: #3498db;">
-            <div class="tajuk-kecil">Keputusan Analisis</div>
-            <div id="deskripsi" style="font-size: 14px; line-height: 1.4;"></div>
-        </div>
+    <div id="result" class="result-box">
+        <div id="persamaan-imbangi" style="text-align: center; margin-bottom: 15px;"></div>
+        <div id="penjelasan-matematik" style="font-size: 14px; color: #555;"></div>
     </div>
 </div>
 
 <script>
-    const database = {
-        "HCl+NaOH": { eq: "HCl + NaOH → NaCl + H₂O", k: "Na⁺", a: "Cl⁻", d: "Menghasilkan Natrium Klorida. Ion kation berasal dari alkali dan anion dari asid." },
-        "HCl+KOH": { eq: "HCl + KOH → KCl + H₂O", k: "K⁺", a: "Cl⁻", d: "Menghasilkan Kalium Klorida. Tindak balas lengkap satu mol asid dan satu mol alkali." },
-        "H2SO4+NaOH": { eq: "H₂SO₄ + 2NaOH → Na₂SO₄ + 2H₂O", k: "Na⁺", a: "SO₄²⁻", d: "Asid sulfurik mendermakan dua ion H⁺. Garam yang terbentuk ialah Natrium Sulfat." },
-        "H2SO4+KOH": { eq: "H₂SO₄ + 2KOH → K₂SO₄ + 2H₂O", k: "K⁺", a: "SO₄²⁻", d: "Menghasilkan Kalium Sulfat. Perhatikan cas anion sulfat ialah 2-." },
-        "HNO3+NaOH": { eq: "HNO₃ + NaOH → NaNO₃ + H₂O", k: "Na⁺", a: "NO₃⁻", d: "Menghasilkan Natrium Nitrat. Semua garam nitrat adalah terlarut dalam air." },
-        "HNO3+KOH": { eq: "HNO₃ + KOH → KNO₃ + H₂O", k: "K⁺", a: "NO₃⁻", d: "Menghasilkan Kalium Nitrat, sering digunakan dalam baja dan bahan api." },
-        "HCl+Ca(OH)2": { eq: "2HCl + Ca(OH)₂ → CaCl₂ + 2H₂O", k: "Ca²⁺", a: "Cl⁻", d: "Kation Kalsium mempunyai cas 2+, maka dua ion Klorida diperlukan." }
+    // Data Imbangan: [AsidCoeff, AlkaliCoeff, SaltCoeff, WaterCoeff]
+    const balancingData = {
+        "HCl+NaOH": { c: [1, 1, 1, 1], salt: "NaCl" },
+        "HCl+Ca(OH)2": { c: [2, 1, 1, 2], salt: "CaCl₂" },
+        "H2SO4+NaOH": { c: [1, 2, 1, 2], salt: "Na₂SO₄" },
+        "H2SO4+Ca(OH)2": { c: [1, 1, 1, 2], salt: "CaSO₄" },
+        "H3PO4+NaOH": { c: [1, 3, 1, 3], salt: "Na₃PO₄" }
     };
 
-    function prosesKimia() {
+    function kiraImbangan() {
         const asid = document.getElementById('asid').value;
         const alkali = document.getElementById('alkali').value;
-        const kunci = asid + "+" + alkali;
-        const data = database[kunci];
+        const key = asid + "+" + alkali;
+        const data = balancingData[key];
 
         if (data) {
-            document.getElementById('hasil-section').style.display = "block";
-            document.getElementById('persamaan').innerText = data.eq;
-            document.getElementById('kation').innerText = data.k;
-            document.getElementById('anion').innerText = data.a;
-            document.getElementById('deskripsi').innerText = data.d;
+            const res = document.getElementById('result');
+            res.style.display = "block";
+            
+            // Paparkan persamaan dengan pekali berwarna
+            document.getElementById('persamaan-imbangi').innerHTML = `
+                <span class="coeff">${data.c[0]}</span>${asid} + 
+                <span class="coeff">${data.c[1]}</span>${alkali} → 
+                <span class="coeff">${data.c[2]}</span>${data.salt} + 
+                <span class="coeff">${data.c[3]}</span>H₂O
+            `;
+
+            // Penjelasan Matematik
+            document.getElementById('penjelasan-matematik').innerHTML = `
+                <b>Nisbah Mol:</b> ${data.c[0]} : ${data.c[1]}<br><br>
+                <i>Kenapa?</i><br>
+                Untuk meneutralkan asid ini sepenuhnya, anda memerlukan 
+                ${data.c[1]} mol alkali bagi setiap ${data.c[0]} mol asid supaya bilangan ion H⁺ dan OH⁻ adalah sama.
+            `;
         } else {
-            alert("Kombinasi ini belum ada dalam data.");
+            alert("Kombinasi ini belum direkodkan.");
         }
     }
 </script>
